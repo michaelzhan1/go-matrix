@@ -6,3 +6,6 @@ run:
 
 build:
 	$(GOFLAGS) $(GO) build ./cmd/main/main.go
+
+test:
+	$(GOFLAGS) $(GO) test -v ./...
