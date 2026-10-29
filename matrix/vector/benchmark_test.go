@@ -40,7 +40,9 @@ func benchmarkVectorAdd(b *testing.B, size int) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		add(v1, v2, res)
+		for i := range v1 {
+			res[i] = v1[i] + v2[i]
+		}
 	}
 }
 
@@ -51,6 +53,6 @@ func benchmarkVectorAddSIMD(b *testing.B, size int) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		addSIMD(v1, v2, res)
+		add(v1, v2, res)
 	}
 }

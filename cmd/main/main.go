@@ -11,5 +11,4 @@ func main() {
 	y := vector.Vector([]float32{4, 5, 6})
 
 	fmt.Println(x.Add(y))
-	fmt.Println(x.AddSIMD(y))
 }
