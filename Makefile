@@ -9,3 +9,6 @@ build:
 
 test:
 	$(GOFLAGS) $(GO) test -v ./...
+
+benchmark:
+	$(GOFLAGS) $(GO) test ./matrix/... -bench=. -benchmem
