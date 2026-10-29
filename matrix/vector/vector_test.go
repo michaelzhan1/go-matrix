@@ -18,3 +18,16 @@ func TestAddSIMD(t *testing.T) {
 		}
 	}
 }
+
+func TestSubSIMD(t *testing.T) {
+	v1 := vector.Vector{1, 2, 3}
+	v2 := vector.Vector{4, 5, 6}
+	res := v1.Sub(v2)
+	expected := vector.Vector{-3, -3, -3}
+	for i := range res {
+		if res[i] != expected[i] {
+			t.Errorf("Sub failed: got %v, want %v", res, expected)
+			return
+		}
+	}
+}
