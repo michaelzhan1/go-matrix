@@ -1,0 +1,12 @@
+{
+    "go.toolsEnvVars": {
+        "GOEXPERIMENT": "simd",
+        "GOTOOLCHAIN": "auto"
+    },
+    "gopls": {
+        "build.env": {
+            "GOEXPERIMENT": "simd",
+            "GOTOOLCHAIN": "auto"
+        }
+    }
+}
