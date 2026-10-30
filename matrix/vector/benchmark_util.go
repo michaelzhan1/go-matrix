@@ -121,3 +121,27 @@ func benchmarkVectorScalarMulSIMD(b *testing.B, size int) {
 		scalarMul(v1, scalar, res)
 	}
 }
+
+func benchmarkVectorScalarDiv(b *testing.B, size int) {
+	v1 := NewRandomVector(size, 0, 100)
+	scalar := float32(2)
+	res := make(Vector, size)
+
+	b.ResetTimer()
+	for b.Loop() {
+		for i := range v1 {
+			res[i] = v1[i] / scalar
+		}
+	}
+}
+
+func benchmarkVectorScalarDivSIMD(b *testing.B, size int) {
+	v1 := NewRandomVector(size, 0, 100)
+	scalar := float32(2)
+	res := make(Vector, size)
+
+	b.ResetTimer()
+	for b.Loop() {
+		scalarDiv(v1, scalar, res)
+	}
+}

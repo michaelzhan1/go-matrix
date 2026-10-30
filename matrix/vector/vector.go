@@ -50,3 +50,11 @@ func (vec Vector) ScalarMul(scalar float32) Vector {
 	scalarMul(vec, scalar, dest)
 	return dest
 }
+
+// ScalarDiv divides a vector by a scalar using SIMD instructions.
+// It assumes the vector has a fixed length.
+func (vec Vector) ScalarDiv(scalar float32) Vector {
+	dest := make(Vector, len(vec))
+	scalarDiv(vec, scalar, dest)
+	return dest
+}

@@ -99,3 +99,18 @@ func scalarMul(vec Vector, scalar float32, dest Vector) {
 		v.StorePart(dest[i:])
 	}
 }
+
+func scalarDiv(vec Vector, scalar float32, dest Vector) {
+	i := 0
+	for ; i+width <= len(vec); i += width {
+		v1 := simd.LoadFloat32s(vec[i : i+width])
+		v := v1.Div(simd.BroadcastFloat32s(scalar))
+		v.Store(dest[i:])
+	}
+
+	if i < len(vec) {
+		v1, _ := simd.LoadFloat32sPart(vec[i:])
+		v := v1.Div(simd.BroadcastFloat32s(scalar))
+		v.StorePart(dest[i:])
+	}
+}
