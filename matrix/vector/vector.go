@@ -8,6 +8,7 @@ import (
 
 var width = simd.VectorBitSize() / 32
 
+// Vector represents a 32-bit float vector.
 type Vector []float32
 
 // Add adds two vectors element-wise using SIMD instructions.
@@ -18,52 +19,12 @@ func (vec Vector) Add(other Vector) Vector {
 	return dest
 }
 
-// add adds two vectors element-wise using SIMD instructions.
-// It is a helper because Go fails to compile the SIMD operations in a method.
-// It writes the result to the dest vector for easier benchmarking
-func add(vec, other, dest Vector) {
-	i := 0
-	for ; i+width <= len(vec); i += width {
-		v1 := simd.LoadFloat32s(vec[i : i+width])
-		v2 := simd.LoadFloat32s(other[i : i+width])
-		v := v1.Add(v2)
-		v.Store(dest[i:])
-	}
-
-	if i < len(vec) {
-		v1, _ := simd.LoadFloat32sPart(vec[i:])
-		v2, _ := simd.LoadFloat32sPart(other[i:])
-		v := v1.Add(v2)
-		v.StorePart(dest[i:])
-	}
-}
-
 // Sub subtracts two vectors element-wise using SIMD instructions.
 // It assumes both vectors have the same length.
 func (vec Vector) Sub(other Vector) Vector {
 	dest := make(Vector, len(vec))
 	sub(vec, other, dest)
 	return dest
-}
-
-// sub subtracts two vectors element-wise using SIMD instructions.
-// It is a helper because Go fails to compile the SIMD operations in a method.
-// It writes the result to the dest vector for easier benchmarking.
-func sub(vec, other, dest Vector) {
-	i := 0
-	for ; i+width <= len(vec); i += width {
-		v1 := simd.LoadFloat32s(vec[i : i+width])
-		v2 := simd.LoadFloat32s(other[i : i+width])
-		v := v1.Sub(v2)
-		v.Store(dest[i:])
-	}
-
-	if i < len(vec) {
-		v1, _ := simd.LoadFloat32sPart(vec[i:])
-		v2, _ := simd.LoadFloat32sPart(other[i:])
-		v := v1.Sub(v2)
-		v.StorePart(dest[i:])
-	}
 }
 
 // Mul multiplies two vectors element-wise using SIMD instructions.
@@ -74,26 +35,6 @@ func (vec Vector) Mul(other Vector) Vector {
 	return dest
 }
 
-// mul multiplies two vectors element-wise using SIMD instructions.
-// It is a helper because Go fails to compile the SIMD operations in a method.
-// It writes the result to the dest vector for easier benchmarking.
-func mul(vec, other, dest Vector) {
-	i := 0
-	for ; i+width <= len(vec); i += width {
-		v1 := simd.LoadFloat32s(vec[i : i+width])
-		v2 := simd.LoadFloat32s(other[i : i+width])
-		v := v1.Mul(v2)
-		v.Store(dest[i:])
-	}
-
-	if i < len(vec) {
-		v1, _ := simd.LoadFloat32sPart(vec[i:])
-		v2, _ := simd.LoadFloat32sPart(other[i:])
-		v := v1.Mul(v2)
-		v.StorePart(dest[i:])
-	}
-}
-
 // Div divides two vectors element-wise using SIMD instructions.
 // It assumes both vectors have the same length.
 func (vec Vector) Div(other Vector) Vector {
@@ -102,48 +43,10 @@ func (vec Vector) Div(other Vector) Vector {
 	return dest
 }
 
-// div divides two vectors element-wise using SIMD instructions.
-// It is a helper because Go fails to compile the SIMD operations in a method.
-// It writes the result to the dest vector for easier benchmarking.
-func div(vec, other, dest Vector) {
-	i := 0
-	for ; i+width <= len(vec); i += width {
-		v1 := simd.LoadFloat32s(vec[i : i+width])
-		v2 := simd.LoadFloat32s(other[i : i+width])
-		v := v1.Div(v2)
-		v.Store(dest[i:])
-	}
-
-	if i < len(vec) {
-		v1, _ := simd.LoadFloat32sPart(vec[i:])
-		v2, _ := simd.LoadFloat32sPart(other[i:])
-		v := v1.Div(v2)
-		v.StorePart(dest[i:])
-	}
-}
-
 // ScalarMul multiplies a vector by a scalar using SIMD instructions.
 // It assumes the vector has a fixed length.
 func (vec Vector) ScalarMul(scalar float32) Vector {
 	dest := make(Vector, len(vec))
 	scalarMul(vec, scalar, dest)
 	return dest
-}
-
-// scalarMul multiplies a vector by a scalar using SIMD instructions.
-// It is a helper because Go fails to compile the SIMD operations in a method.
-// It writes the result to the dest vector for easier benchmarking.
-func scalarMul(vec Vector, scalar float32, dest Vector) {
-	i := 0
-	for ; i+width <= len(vec); i += width {
-		v1 := simd.LoadFloat32s(vec[i : i+width])
-		v := v1.Mul(simd.BroadcastFloat32s(scalar))
-		v.Store(dest[i:])
-	}
-
-	if i < len(vec) {
-		v1, _ := simd.LoadFloat32sPart(vec[i:])
-		v := v1.Mul(simd.BroadcastFloat32s(scalar))
-		v.StorePart(dest[i:])
-	}
 }
