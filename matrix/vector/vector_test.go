@@ -57,3 +57,16 @@ func TestDivSIMD(t *testing.T) {
 		}
 	}
 }
+
+func TestScalarMulSIMD(t *testing.T) {
+	v1 := vector.Vector{1, 2, 3}
+	scalar := float32(2)
+	res := v1.ScalarMul(scalar)
+	expected := vector.Vector{2, 4, 6}
+	for i := range res {
+		if res[i] != expected[i] {
+			t.Errorf("ScalarMul failed: got %v, want %v", res, expected)
+			return
+		}
+	}
+}

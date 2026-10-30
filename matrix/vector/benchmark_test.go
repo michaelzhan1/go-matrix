@@ -106,6 +106,32 @@ func BenchmarkVectorDiv(b *testing.B) {
 	}
 }
 
+func BenchmarkVectorScalarMul(b *testing.B) {
+	for _, tc := range []struct {
+		name string
+		fn   func(*testing.B, int)
+	}{
+		{"Regular", benchmarkVectorScalarMul},
+		{"SIMD", benchmarkVectorScalarMulSIMD},
+	} {
+		b.Run(tc.name, func(b *testing.B) {
+			for _, size := range []struct {
+				name string
+				n    int
+			}{
+				{"Small", 1 << 5},
+				{"Medium", 1 << 10},
+				{"Large", 1 << 20},
+				{"NonMultiple", 999999},
+			} {
+				b.Run(size.name, func(b *testing.B) {
+					tc.fn(b, size.n)
+				})
+			}
+		})
+	}
+}
+
 func benchmarkVectorAdd(b *testing.B, size int) {
 	v1 := NewRandomVector(size, 0, 100)
 	v2 := NewRandomVector(size, 0, 100)
@@ -199,5 +225,29 @@ func benchmarkVectorDivSIMD(b *testing.B, size int) {
 	b.ResetTimer()
 	for b.Loop() {
 		div(v1, v2, res)
+	}
+}
+
+func benchmarkVectorScalarMul(b *testing.B, size int) {
+	v1 := NewRandomVector(size, 0, 100)
+	scalar := float32(2)
+	res := make(Vector, size)
+
+	b.ResetTimer()
+	for b.Loop() {
+		for i := range v1 {
+			res[i] = v1[i] * scalar
+		}
+	}
+}
+
+func benchmarkVectorScalarMulSIMD(b *testing.B, size int) {
+	v1 := NewRandomVector(size, 0, 100)
+	scalar := float32(2)
+	res := make(Vector, size)
+
+	b.ResetTimer()
+	for b.Loop() {
+		scalarMul(v1, scalar, res)
 	}
 }

@@ -121,3 +121,29 @@ func div(vec, other, dest Vector) {
 		v.StorePart(dest[i:])
 	}
 }
+
+// ScalarMul multiplies a vector by a scalar using SIMD instructions.
+// It assumes the vector has a fixed length.
+func (vec Vector) ScalarMul(scalar float32) Vector {
+	dest := make(Vector, len(vec))
+	scalarMul(vec, scalar, dest)
+	return dest
+}
+
+// scalarMul multiplies a vector by a scalar using SIMD instructions.
+// It is a helper because Go fails to compile the SIMD operations in a method.
+// It writes the result to the dest vector for easier benchmarking.
+func scalarMul(vec Vector, scalar float32, dest Vector) {
+	i := 0
+	for ; i+width <= len(vec); i += width {
+		v1 := simd.LoadFloat32s(vec[i : i+width])
+		v := v1.Mul(simd.BroadcastFloat32s(scalar))
+		v.Store(dest[i:])
+	}
+
+	if i < len(vec) {
+		v1, _ := simd.LoadFloat32sPart(vec[i:])
+		v := v1.Mul(simd.BroadcastFloat32s(scalar))
+		v.StorePart(dest[i:])
+	}
+}
