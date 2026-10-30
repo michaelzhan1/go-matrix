@@ -145,3 +145,27 @@ func benchmarkVectorScalarDivSIMD(b *testing.B, size int) {
 		scalarDiv(v1, scalar, res)
 	}
 }
+
+func benchmarkVectorDot(b *testing.B, size int) {
+	v1 := NewRandomVector(size, 0, 100)
+	v2 := NewRandomVector(size, 0, 100)
+
+	b.ResetTimer()
+	for b.Loop() {
+		var sum float32
+		for i := range v1 {
+			sum += v1[i] * v2[i]
+		}
+		_ = sum
+	}
+}
+
+func benchmarkVectorDotSIMD(b *testing.B, size int) {
+	v1 := NewRandomVector(size, 0, 100)
+	v2 := NewRandomVector(size, 0, 100)
+
+	b.ResetTimer()
+	for b.Loop() {
+		_ = dot(v1, v2)
+	}
+}

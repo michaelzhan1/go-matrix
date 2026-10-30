@@ -157,3 +157,29 @@ func BenchmarkVectorScalarDiv(b *testing.B) {
 		})
 	}
 }
+
+func BenchmarkVectorDot(b *testing.B) {
+	for _, tc := range []struct {
+		name string
+		fn   func(*testing.B, int)
+	}{
+		{"Regular", benchmarkVectorDot},
+		{"SIMD", benchmarkVectorDotSIMD},
+	} {
+		b.Run(tc.name, func(b *testing.B) {
+			for _, size := range []struct {
+				name string
+				n    int
+			}{
+				{"Small", 1 << 5},
+				{"Medium", 1 << 10},
+				{"Large", 1 << 20},
+				{"NonMultiple", 999999},
+			} {
+				b.Run(size.name, func(b *testing.B) {
+					tc.fn(b, size.n)
+				})
+			}
+		})
+	}
+}

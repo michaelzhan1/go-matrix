@@ -83,3 +83,13 @@ func TestScalarDivSIMD(t *testing.T) {
 		}
 	}
 }
+
+func TestDotSIMD(t *testing.T) {
+	v1 := vector.Vector{1, 2, 3}
+	v2 := vector.Vector{4, 5, 6}
+	res := v1.Dot(v2)
+	expected := float32(32)
+	if res != expected {
+		t.Errorf("Dot failed: got %v, want %v", res, expected)
+	}
+}

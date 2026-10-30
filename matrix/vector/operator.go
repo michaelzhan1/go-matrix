@@ -2,9 +2,10 @@ package vector
 
 import "simd"
 
+// this file is needed because Go will not compile if SIMD is used in a struct.
+// these functions all take destination vectors to help with benchmarking.
+
 // add adds two vectors element-wise using SIMD instructions.
-// It is a helper because Go fails to compile the SIMD operations in a method.
-// It writes the result to the dest vector for easier benchmarking
 func add(vec, other, dest Vector) {
 	i := 0
 	for ; i+width <= len(vec); i += width {
@@ -23,8 +24,6 @@ func add(vec, other, dest Vector) {
 }
 
 // sub subtracts two vectors element-wise using SIMD instructions.
-// It is a helper because Go fails to compile the SIMD operations in a method.
-// It writes the result to the dest vector for easier benchmarking.
 func sub(vec, other, dest Vector) {
 	i := 0
 	for ; i+width <= len(vec); i += width {
@@ -43,8 +42,6 @@ func sub(vec, other, dest Vector) {
 }
 
 // mul multiplies two vectors element-wise using SIMD instructions.
-// It is a helper because Go fails to compile the SIMD operations in a method.
-// It writes the result to the dest vector for easier benchmarking.
 func mul(vec, other, dest Vector) {
 	i := 0
 	for ; i+width <= len(vec); i += width {
@@ -63,8 +60,6 @@ func mul(vec, other, dest Vector) {
 }
 
 // div divides two vectors element-wise using SIMD instructions.
-// It is a helper because Go fails to compile the SIMD operations in a method.
-// It writes the result to the dest vector for easier benchmarking.
 func div(vec, other, dest Vector) {
 	i := 0
 	for ; i+width <= len(vec); i += width {
@@ -83,8 +78,6 @@ func div(vec, other, dest Vector) {
 }
 
 // scalarMul multiplies a vector by a scalar using SIMD instructions.
-// It is a helper because Go fails to compile the SIMD operations in a method.
-// It writes the result to the dest vector for easier benchmarking.
 func scalarMul(vec Vector, scalar float32, dest Vector) {
 	i := 0
 	for ; i+width <= len(vec); i += width {
@@ -100,6 +93,7 @@ func scalarMul(vec Vector, scalar float32, dest Vector) {
 	}
 }
 
+// scalarDiv divides a vector by a scalar using SIMD instructions.
 func scalarDiv(vec Vector, scalar float32, dest Vector) {
 	i := 0
 	for ; i+width <= len(vec); i += width {
@@ -113,4 +107,29 @@ func scalarDiv(vec Vector, scalar float32, dest Vector) {
 		v := v1.Div(simd.BroadcastFloat32s(scalar))
 		v.StorePart(dest[i:])
 	}
+}
+
+// dot computes the dot product of two vectors using SIMD instructions.
+func dot(vec, other Vector) float32 {
+	v := simd.BroadcastFloat32s(0)
+	i := 0
+	for ; i+width <= len(vec); i += width {
+		v1 := simd.LoadFloat32s(vec[i : i+width])
+		v2 := simd.LoadFloat32s(other[i : i+width])
+		v = v.Add(v1.Mul(v2))
+	}
+
+	if i < len(vec) {
+		v1, _ := simd.LoadFloat32sPart(vec[i:])
+		v2, _ := simd.LoadFloat32sPart(other[i:])
+		v = v.Add(v1.Mul(v2))
+	}
+
+	vSlice := make([]float32, width)
+	v.Store(vSlice)
+	var sum float32
+	for _, x := range vSlice {
+		sum += x
+	}
+	return sum
 }

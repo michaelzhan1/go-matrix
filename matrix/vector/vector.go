@@ -44,7 +44,6 @@ func (vec Vector) Div(other Vector) Vector {
 }
 
 // ScalarMul multiplies a vector by a scalar using SIMD instructions.
-// It assumes the vector has a fixed length.
 func (vec Vector) ScalarMul(scalar float32) Vector {
 	dest := make(Vector, len(vec))
 	scalarMul(vec, scalar, dest)
@@ -52,9 +51,14 @@ func (vec Vector) ScalarMul(scalar float32) Vector {
 }
 
 // ScalarDiv divides a vector by a scalar using SIMD instructions.
-// It assumes the vector has a fixed length.
 func (vec Vector) ScalarDiv(scalar float32) Vector {
 	dest := make(Vector, len(vec))
 	scalarDiv(vec, scalar, dest)
 	return dest
+}
+
+// Dot computes the dot product of two vectors using SIMD instructions.
+// It assumes both vectors have the same length.
+func (vec Vector) Dot(other Vector) float32 {
+	return dot(vec, other)
 }
