@@ -44,6 +44,20 @@ func (vec Vector) Div(other Vector) Vector {
 	return dest
 }
 
+// ScalarAdd adds a scalar to each element of the vector using SIMD instructions.
+func (vec Vector) ScalarAdd(scalar float32) Vector {
+	dest := make(Vector, len(vec))
+	scalarAdd(vec, scalar, dest)
+	return dest
+}
+
+// ScalarSub subtracts a scalar from each element of the vector using SIMD instructions.
+func (vec Vector) ScalarSub(scalar float32) Vector {
+	dest := make(Vector, len(vec))
+	scalarSub(vec, scalar, dest)
+	return dest
+}
+
 // ScalarMul multiplies a vector by a scalar using SIMD instructions.
 func (vec Vector) ScalarMul(scalar float32) Vector {
 	dest := make(Vector, len(vec))
@@ -67,4 +81,31 @@ func (vec Vector) Dot(other Vector) float32 {
 // Norm computes the L2 norm of the vector.
 func (vec Vector) Norm() float32 {
 	return float32(math.Sqrt(float64(vec.Dot(vec))))
+}
+
+// Sum computes the sum of the elements of the vector using SIMD instructions.
+func (vec Vector) Sum() float32 {
+	return sum(vec)
+}
+
+// StdDev computes the population standard deviation of the elements of the vector using SIMD instructions.
+// The vector cannot be empty.
+func (vec Vector) StdDev() float32 {
+	mean := vec.Mean()
+	tmp := vec.ScalarSub(mean)
+	return float32(math.Sqrt(float64(tmp.Dot(tmp)) / float64(len(vec))))
+}
+
+// Mean computes the mean of the elements of the vector using SIMD instructions.
+// The vector cannot be empty.
+func (vec Vector) Mean() float32 {
+	return sum(vec) / float32(len(vec))
+}
+
+// Standardize will zero and scale the vector to mean 0 and standard deviation 1.
+// It will fail for constant or empty vectors.
+func (vec Vector) Standardize() Vector {
+	mu := vec.Mean()
+	sigma := vec.StdDev()
+	return vec.ScalarSub(mu).ScalarDiv(sigma)
 }

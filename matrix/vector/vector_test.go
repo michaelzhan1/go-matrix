@@ -58,6 +58,32 @@ func TestDiv(t *testing.T) {
 	}
 }
 
+func TestScalarAdd(t *testing.T) {
+	v1 := vector.Vector{1, 2, 3}
+	scalar := float32(2)
+	res := v1.ScalarAdd(scalar)
+	expected := vector.Vector{3, 4, 5}
+	for i := range res {
+		if res[i] != expected[i] {
+			t.Errorf("ScalarAdd failed: got %v, want %v", res, expected)
+			return
+		}
+	}
+}
+
+func TestScalarSub(t *testing.T) {
+	v1 := vector.Vector{1, 2, 3}
+	scalar := float32(2)
+	res := v1.ScalarSub(scalar)
+	expected := vector.Vector{-1, 0, 1}
+	for i := range res {
+		if res[i] != expected[i] {
+			t.Errorf("ScalarSub failed: got %v, want %v", res, expected)
+			return
+		}
+	}
+}
+
 func TestScalarMul(t *testing.T) {
 	v1 := vector.Vector{1, 2, 3}
 	scalar := float32(2)
@@ -100,5 +126,44 @@ func TestNorm(t *testing.T) {
 	expected := float32(6)
 	if res != expected {
 		t.Errorf("Norm failed: got %v, want %v", res, expected)
+	}
+}
+
+func TestSum(t *testing.T) {
+	v1 := vector.Vector{1, 2, 3}
+	res := v1.Sum()
+	expected := float32(6)
+	if res != expected {
+		t.Errorf("Sum failed: got %v, want %v", res, expected)
+	}
+}
+
+func TestStdDev(t *testing.T) {
+	v1 := vector.Vector{1, 1, 5, 5}
+	res := v1.StdDev()
+	expected := float32(2)
+	if res != expected {
+		t.Errorf("StdDev failed: got %v, want %v", res, expected)
+	}
+}
+
+func TestMean(t *testing.T) {
+	v1 := vector.Vector{1, 2, 3}
+	res := v1.Mean()
+	expected := float32(2)
+	if res != expected {
+		t.Errorf("Mean failed: got %v, want %v", res, expected)
+	}
+}
+
+func TestStandardize(t *testing.T) {
+	v1 := vector.Vector{1, 1, 5, 5}
+	res := v1.Standardize()
+	expected := vector.Vector{-1, -1, 1, 1}
+	for i := range res {
+		if res[i] != expected[i] {
+			t.Errorf("Standardize failed: got %v, want %v", res, expected)
+			return
+		}
 	}
 }
