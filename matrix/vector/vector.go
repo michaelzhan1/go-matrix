@@ -1,6 +1,7 @@
 package vector
 
 import (
+	"math"
 	"simd"
 )
 
@@ -61,4 +62,9 @@ func (vec Vector) ScalarDiv(scalar float32) Vector {
 // It assumes both vectors have the same length.
 func (vec Vector) Dot(other Vector) float32 {
 	return dot(vec, other)
+}
+
+// Norm computes the L2 norm of the vector.
+func (vec Vector) Norm() float32 {
+	return float32(math.Sqrt(float64(vec.Dot(vec))))
 }

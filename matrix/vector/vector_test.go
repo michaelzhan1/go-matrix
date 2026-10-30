@@ -6,7 +6,7 @@ import (
 	"github.com/michaelzhan1/go-matrix/matrix/vector"
 )
 
-func TestAddSIMD(t *testing.T) {
+func TestAdd(t *testing.T) {
 	v1 := vector.Vector{1, 2, 3}
 	v2 := vector.Vector{4, 5, 6}
 	res := v1.Add(v2)
@@ -19,7 +19,7 @@ func TestAddSIMD(t *testing.T) {
 	}
 }
 
-func TestSubSIMD(t *testing.T) {
+func TestSub(t *testing.T) {
 	v1 := vector.Vector{1, 2, 3}
 	v2 := vector.Vector{4, 5, 6}
 	res := v1.Sub(v2)
@@ -32,7 +32,7 @@ func TestSubSIMD(t *testing.T) {
 	}
 }
 
-func TestMulSIMD(t *testing.T) {
+func TestMul(t *testing.T) {
 	v1 := vector.Vector{1, 2, 3}
 	v2 := vector.Vector{4, 5, 6}
 	res := v1.Mul(v2)
@@ -45,7 +45,7 @@ func TestMulSIMD(t *testing.T) {
 	}
 }
 
-func TestDivSIMD(t *testing.T) {
+func TestDiv(t *testing.T) {
 	v1 := vector.Vector{1, 2, 3}
 	v2 := vector.Vector{4, 5, 6}
 	res := v1.Div(v2)
@@ -58,7 +58,7 @@ func TestDivSIMD(t *testing.T) {
 	}
 }
 
-func TestScalarMulSIMD(t *testing.T) {
+func TestScalarMul(t *testing.T) {
 	v1 := vector.Vector{1, 2, 3}
 	scalar := float32(2)
 	res := v1.ScalarMul(scalar)
@@ -71,7 +71,7 @@ func TestScalarMulSIMD(t *testing.T) {
 	}
 }
 
-func TestScalarDivSIMD(t *testing.T) {
+func TestScalarDiv(t *testing.T) {
 	v1 := vector.Vector{1, 2, 3}
 	scalar := float32(2)
 	res := v1.ScalarDiv(scalar)
@@ -84,12 +84,21 @@ func TestScalarDivSIMD(t *testing.T) {
 	}
 }
 
-func TestDotSIMD(t *testing.T) {
+func TestDot(t *testing.T) {
 	v1 := vector.Vector{1, 2, 3}
 	v2 := vector.Vector{4, 5, 6}
 	res := v1.Dot(v2)
 	expected := float32(32)
 	if res != expected {
 		t.Errorf("Dot failed: got %v, want %v", res, expected)
+	}
+}
+
+func TestNorm(t *testing.T) {
+	v1 := vector.Vector{2, 4, 4}
+	res := v1.Norm()
+	expected := float32(6)
+	if res != expected {
+		t.Errorf("Norm failed: got %v, want %v", res, expected)
 	}
 }
