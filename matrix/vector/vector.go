@@ -2,12 +2,9 @@ package vector
 
 import (
 	"math"
-	"simd"
 )
 
 // 32-bit float vectors for now
-
-var width = simd.VectorBitSize() / 32
 
 // Vector represents a 32-bit float vector.
 type Vector []float32
