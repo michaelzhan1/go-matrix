@@ -5,6 +5,8 @@ import "simd"
 // this file is needed because Go will not compile if SIMD is used in a struct.
 // these functions all take destination vectors to help with benchmarking.
 
+var width = simd.VectorBitSize() / 32
+
 // add adds two vectors element-wise using SIMD instructions.
 func add(vec, other, dest Vector) {
 	i := 0
