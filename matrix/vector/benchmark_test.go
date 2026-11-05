@@ -2,184 +2,119 @@ package vector
 
 import "testing"
 
+type benchCase struct {
+	name string
+	fn   func(*testing.B, int)
+}
+
+type benchSize struct {
+	name string
+	n    int
+}
+
+var benchSizes = []benchSize{
+	{"Small", 1 << 5},
+	{"Medium", 1 << 10},
+	{"Large", 1 << 20},
+	{"NonMultiple", 999999},
+}
+
+func runBenchmarks(b *testing.B, name string, fn func(*testing.B, int)) {
+	b.Run(name, func(b *testing.B) {
+		for _, size := range benchSizes {
+			b.Run(size.name, func(b *testing.B) {
+				fn(b, size.n)
+			})
+		}
+	})
+}
+
 func BenchmarkVectorAdd(b *testing.B) {
-	for _, tc := range []struct {
-		name string
-		fn   func(*testing.B, int)
-	}{
+	for _, tc := range []benchCase{
 		{"Regular", benchmarkVectorAdd},
 		{"SIMD", benchmarkVectorAddSIMD},
 	} {
-		b.Run(tc.name, func(b *testing.B) {
-			for _, size := range []struct {
-				name string
-				n    int
-			}{
-				{"Small", 1 << 5},
-				{"Medium", 1 << 10},
-				{"Large", 1 << 20},
-				{"NonMultiple", 999999},
-			} {
-				b.Run(size.name, func(b *testing.B) {
-					tc.fn(b, size.n)
-				})
-			}
-		})
+		runBenchmarks(b, tc.name, tc.fn)
 	}
 }
 
 func BenchmarkVectorSub(b *testing.B) {
-	for _, tc := range []struct {
-		name string
-		fn   func(*testing.B, int)
-	}{
+	for _, tc := range []benchCase{
 		{"Regular", benchmarkVectorSub},
 		{"SIMD", benchmarkVectorSubSIMD},
 	} {
-		b.Run(tc.name, func(b *testing.B) {
-			for _, size := range []struct {
-				name string
-				n    int
-			}{
-				{"Small", 1 << 5},
-				{"Medium", 1 << 10},
-				{"Large", 1 << 20},
-				{"NonMultiple", 999999},
-			} {
-				b.Run(size.name, func(b *testing.B) {
-					tc.fn(b, size.n)
-				})
-			}
-		})
+		runBenchmarks(b, tc.name, tc.fn)
 	}
 }
 
 func BenchmarkVectorMul(b *testing.B) {
-	for _, tc := range []struct {
-		name string
-		fn   func(*testing.B, int)
-	}{
+	for _, tc := range []benchCase{
 		{"Regular", benchmarkVectorMul},
 		{"SIMD", benchmarkVectorMulSIMD},
 	} {
-		b.Run(tc.name, func(b *testing.B) {
-			for _, size := range []struct {
-				name string
-				n    int
-			}{
-				{"Small", 1 << 5},
-				{"Medium", 1 << 10},
-				{"Large", 1 << 20},
-				{"NonMultiple", 999999},
-			} {
-				b.Run(size.name, func(b *testing.B) {
-					tc.fn(b, size.n)
-				})
-			}
-		})
+		runBenchmarks(b, tc.name, tc.fn)
 	}
 }
 
 func BenchmarkVectorDiv(b *testing.B) {
-	for _, tc := range []struct {
-		name string
-		fn   func(*testing.B, int)
-	}{
+	for _, tc := range []benchCase{
 		{"Regular", benchmarkVectorDiv},
 		{"SIMD", benchmarkVectorDivSIMD},
 	} {
-		b.Run(tc.name, func(b *testing.B) {
-			for _, size := range []struct {
-				name string
-				n    int
-			}{
-				{"Small", 1 << 5},
-				{"Medium", 1 << 10},
-				{"Large", 1 << 20},
-				{"NonMultiple", 999999},
-			} {
-				b.Run(size.name, func(b *testing.B) {
-					tc.fn(b, size.n)
-				})
-			}
-		})
+		runBenchmarks(b, tc.name, tc.fn)
+	}
+}
+
+func BenchmarkVectorScalarAdd(b *testing.B) {
+	for _, tc := range []benchCase{
+		{"Regular", benchmarkVectorScalarAdd},
+		{"SIMD", benchmarkVectorScalarAddSIMD},
+	} {
+		runBenchmarks(b, tc.name, tc.fn)
+	}
+}
+
+func BenchmarkVectorScalarSub(b *testing.B) {
+	for _, tc := range []benchCase{
+		{"Regular", benchmarkVectorScalarSub},
+		{"SIMD", benchmarkVectorScalarSubSIMD},
+	} {
+		runBenchmarks(b, tc.name, tc.fn)
 	}
 }
 
 func BenchmarkVectorScalarMul(b *testing.B) {
-	for _, tc := range []struct {
-		name string
-		fn   func(*testing.B, int)
-	}{
+	for _, tc := range []benchCase{
 		{"Regular", benchmarkVectorScalarMul},
 		{"SIMD", benchmarkVectorScalarMulSIMD},
 	} {
-		b.Run(tc.name, func(b *testing.B) {
-			for _, size := range []struct {
-				name string
-				n    int
-			}{
-				{"Small", 1 << 5},
-				{"Medium", 1 << 10},
-				{"Large", 1 << 20},
-				{"NonMultiple", 999999},
-			} {
-				b.Run(size.name, func(b *testing.B) {
-					tc.fn(b, size.n)
-				})
-			}
-		})
+		runBenchmarks(b, tc.name, tc.fn)
 	}
 }
 
 func BenchmarkVectorScalarDiv(b *testing.B) {
-	for _, tc := range []struct {
-		name string
-		fn   func(*testing.B, int)
-	}{
+	for _, tc := range []benchCase{
 		{"Regular", benchmarkVectorScalarDiv},
 		{"SIMD", benchmarkVectorScalarDivSIMD},
 	} {
-		b.Run(tc.name, func(b *testing.B) {
-			for _, size := range []struct {
-				name string
-				n    int
-			}{
-				{"Small", 1 << 5},
-				{"Medium", 1 << 10},
-				{"Large", 1 << 20},
-				{"NonMultiple", 999999},
-			} {
-				b.Run(size.name, func(b *testing.B) {
-					tc.fn(b, size.n)
-				})
-			}
-		})
+		runBenchmarks(b, tc.name, tc.fn)
 	}
 }
 
 func BenchmarkVectorDot(b *testing.B) {
-	for _, tc := range []struct {
-		name string
-		fn   func(*testing.B, int)
-	}{
+	for _, tc := range []benchCase{
 		{"Regular", benchmarkVectorDot},
 		{"SIMD", benchmarkVectorDotSIMD},
 	} {
-		b.Run(tc.name, func(b *testing.B) {
-			for _, size := range []struct {
-				name string
-				n    int
-			}{
-				{"Small", 1 << 5},
-				{"Medium", 1 << 10},
-				{"Large", 1 << 20},
-				{"NonMultiple", 999999},
-			} {
-				b.Run(size.name, func(b *testing.B) {
-					tc.fn(b, size.n)
-				})
-			}
-		})
+		runBenchmarks(b, tc.name, tc.fn)
+	}
+}
+
+func BenchmarkVectorSum(b *testing.B) {
+	for _, tc := range []benchCase{
+		{"Regular", benchmarkVectorSum},
+		{"SIMD", benchmarkVectorSumSIMD},
+	} {
+		runBenchmarks(b, tc.name, tc.fn)
 	}
 }

@@ -9,9 +9,7 @@ func benchmarkVectorAdd(b *testing.B, size int) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		for i := range v1 {
-			res[i] = v1[i] + v2[i]
-		}
+		naiveAdd(v1, v2, res)
 	}
 }
 
@@ -33,9 +31,7 @@ func benchmarkVectorSub(b *testing.B, size int) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		for i := range v1 {
-			res[i] = v1[i] - v2[i]
-		}
+		naiveSub(v1, v2, res)
 	}
 }
 
@@ -57,9 +53,7 @@ func benchmarkVectorMul(b *testing.B, size int) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		for i := range v1 {
-			res[i] = v1[i] * v2[i]
-		}
+		naiveMul(v1, v2, res)
 	}
 }
 
@@ -81,9 +75,7 @@ func benchmarkVectorDiv(b *testing.B, size int) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		for i := range v1 {
-			res[i] = v1[i] / v2[i]
-		}
+		naiveDiv(v1, v2, res)
 	}
 }
 
@@ -98,6 +90,50 @@ func benchmarkVectorDivSIMD(b *testing.B, size int) {
 	}
 }
 
+func benchmarkVectorScalarAdd(b *testing.B, size int) {
+	v1 := NewRandomVector(size, 0, 100)
+	scalar := float32(2)
+	res := make(Vector, size)
+
+	b.ResetTimer()
+	for b.Loop() {
+		naiveScalarAdd(v1, scalar, res)
+	}
+}
+
+func benchmarkVectorScalarAddSIMD(b *testing.B, size int) {
+	v1 := NewRandomVector(size, 0, 100)
+	scalar := float32(2)
+	res := make(Vector, size)
+
+	b.ResetTimer()
+	for b.Loop() {
+		scalarAdd(v1, scalar, res)
+	}
+}
+
+func benchmarkVectorScalarSub(b *testing.B, size int) {
+	v1 := NewRandomVector(size, 0, 100)
+	scalar := float32(2)
+	res := make(Vector, size)
+
+	b.ResetTimer()
+	for b.Loop() {
+		naiveScalarSub(v1, scalar, res)
+	}
+}
+
+func benchmarkVectorScalarSubSIMD(b *testing.B, size int) {
+	v1 := NewRandomVector(size, 0, 100)
+	scalar := float32(2)
+	res := make(Vector, size)
+
+	b.ResetTimer()
+	for b.Loop() {
+		scalarSub(v1, scalar, res)
+	}
+}
+
 func benchmarkVectorScalarMul(b *testing.B, size int) {
 	v1 := NewRandomVector(size, 0, 100)
 	scalar := float32(2)
@@ -105,9 +141,7 @@ func benchmarkVectorScalarMul(b *testing.B, size int) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		for i := range v1 {
-			res[i] = v1[i] * scalar
-		}
+		naiveScalarMul(v1, scalar, res)
 	}
 }
 
@@ -129,9 +163,7 @@ func benchmarkVectorScalarDiv(b *testing.B, size int) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		for i := range v1 {
-			res[i] = v1[i] / scalar
-		}
+		naiveScalarDiv(v1, scalar, res)
 	}
 }
 
@@ -152,11 +184,7 @@ func benchmarkVectorDot(b *testing.B, size int) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		var sum float32
-		for i := range v1 {
-			sum += v1[i] * v2[i]
-		}
-		_ = sum
+		_ = naiveDot(v1, v2)
 	}
 }
 
@@ -167,5 +195,23 @@ func benchmarkVectorDotSIMD(b *testing.B, size int) {
 	b.ResetTimer()
 	for b.Loop() {
 		_ = dot(v1, v2)
+	}
+}
+
+func benchmarkVectorSum(b *testing.B, size int) {
+	v := NewRandomVector(size, 0, 100)
+
+	b.ResetTimer()
+	for b.Loop() {
+		_ = naiveSum(v)
+	}
+}
+
+func benchmarkVectorSumSIMD(b *testing.B, size int) {
+	v := NewRandomVector(size, 0, 100)
+
+	b.ResetTimer()
+	for b.Loop() {
+		_ = sum(v)
 	}
 }

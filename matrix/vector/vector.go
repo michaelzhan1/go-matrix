@@ -78,14 +78,14 @@ func (vec Vector) Dot(other Vector) float32 {
 	return dot(vec, other)
 }
 
-// Norm computes the L2 norm of the vector.
-func (vec Vector) Norm() float32 {
-	return float32(math.Sqrt(float64(vec.Dot(vec))))
-}
-
 // Sum computes the sum of the elements of the vector using SIMD instructions.
 func (vec Vector) Sum() float32 {
 	return sum(vec)
+}
+
+// Norm computes the L2 norm of the vector.
+func (vec Vector) Norm() float32 {
+	return float32(math.Sqrt(float64(vec.Dot(vec))))
 }
 
 // StdDev computes the population standard deviation of the elements of the vector using SIMD instructions.
