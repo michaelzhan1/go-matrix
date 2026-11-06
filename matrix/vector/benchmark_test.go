@@ -13,9 +13,9 @@ type benchSize struct {
 }
 
 var benchSizes = []benchSize{
-	{"Small", 1 << 5},
-	{"Medium", 1 << 10},
-	{"Large", 1 << 20},
+	{"Small", 1 << 6},
+	{"Medium", 1 << 14},
+	{"Large", 1 << 22},
 	{"NonMultiple", 999999},
 }
 

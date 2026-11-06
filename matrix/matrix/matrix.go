@@ -45,14 +45,17 @@ func (m *Matrix) Set(row, col int, value float32) {
 	m.values[row*m.stride[0]+col*m.stride[1]] = value
 }
 
+// Rows returns the number of rows in the matrix
 func (m *Matrix) Rows() int {
 	return m.rows
 }
 
+// Cols returns the number of columns in the matrix
 func (m *Matrix) Cols() int {
 	return m.cols
 }
 
+// Values returns the underlying 2D slice of float32 values
 func (m *Matrix) Values() [][]float32 {
 	values := make([][]float32, m.rows)
 	for i := range m.rows {
@@ -62,6 +65,7 @@ func (m *Matrix) Values() [][]float32 {
 	return values
 }
 
+// Add adds two matrices and returns a new matrix with the result
 func (m *Matrix) Add(other *Matrix) *Matrix {
 	if m.rows != other.rows || m.cols != other.cols {
 		panic(fmt.Sprintf("matrix dimensions do not match: %dx%d vs %dx%d", m.rows, m.cols, other.rows, other.cols))
