@@ -73,6 +73,38 @@ func (m *Matrix) Add(other *Matrix) *Matrix {
 
 	res := NewMatrix(m.rows, m.cols)
 	add(m.values, other.values, res.values)
+	return res
+}
 
+// Sub subtracts two matrices and returns a new matrix with the result
+func (m *Matrix) Sub(other *Matrix) *Matrix {
+	if m.rows != other.rows || m.cols != other.cols {
+		panic(fmt.Sprintf("matrix dimensions do not match: %dx%d vs %dx%d", m.rows, m.cols, other.rows, other.cols))
+	}
+
+	res := NewMatrix(m.rows, m.cols)
+	sub(m.values, other.values, res.values)
+	return res
+}
+
+// ElemMul multiplies two matrices element-wise and returns a new matrix with the result
+func (m *Matrix) ElemMul(other *Matrix) *Matrix {
+	if m.rows != other.rows || m.cols != other.cols {
+		panic(fmt.Sprintf("matrix dimensions do not match: %dx%d vs %dx%d", m.rows, m.cols, other.rows, other.cols))
+	}
+
+	res := NewMatrix(m.rows, m.cols)
+	elemMul(m.values, other.values, res.values)
+	return res
+}
+
+// ElemDiv divides two matrices element-wise and returns a new matrix with the result
+func (m *Matrix) ElemDiv(other *Matrix) *Matrix {
+	if m.rows != other.rows || m.cols != other.cols {
+		panic(fmt.Sprintf("matrix dimensions do not match: %dx%d vs %dx%d", m.rows, m.cols, other.rows, other.cols))
+	}
+
+	res := NewMatrix(m.rows, m.cols)
+	elemDiv(m.values, other.values, res.values)
 	return res
 }

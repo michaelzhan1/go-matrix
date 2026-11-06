@@ -21,10 +21,82 @@ func TestAdd(t *testing.T) {
 		{14, 16, 18},
 	})
 
-	for i := 0; i < result.Rows(); i++ {
-		for j := 0; j < result.Cols(); j++ {
+	for i := range result.Rows() {
+		for j := range result.Cols() {
 			if result.Get(i, j) != expected.Get(i, j) {
 				t.Errorf("Add failed at (%d,%d): got %v, want %v", i, j, result.Get(i, j), expected.Get(i, j))
+			}
+		}
+	}
+}
+
+func TestSub(t *testing.T) {
+	m1 := matrix.From2DSlice([][]float32{
+		{7, 8, 9},
+		{10, 11, 12},
+	})
+	m2 := matrix.From2DSlice([][]float32{
+		{1, 2, 3},
+		{4, 5, 6},
+	})
+	result := m1.Sub(m2)
+	expected := matrix.From2DSlice([][]float32{
+		{6, 6, 6},
+		{6, 6, 6},
+	})
+
+	for i := range result.Rows() {
+		for j := range result.Cols() {
+			if result.Get(i, j) != expected.Get(i, j) {
+				t.Errorf("Sub failed at (%d,%d): got %v, want %v", i, j, result.Get(i, j), expected.Get(i, j))
+			}
+		}
+	}
+}
+
+func TestElemMul(t *testing.T) {
+	m1 := matrix.From2DSlice([][]float32{
+		{1, 2, 3},
+		{4, 5, 6},
+	})
+	m2 := matrix.From2DSlice([][]float32{
+		{7, 8, 9},
+		{10, 11, 12},
+	})
+	result := m1.ElemMul(m2)
+	expected := matrix.From2DSlice([][]float32{
+		{7, 16, 27},
+		{40, 55, 72},
+	})
+
+	for i := range result.Rows() {
+		for j := range result.Cols() {
+			if result.Get(i, j) != expected.Get(i, j) {
+				t.Errorf("ElemMul failed at (%d,%d): got %v, want %v", i, j, result.Get(i, j), expected.Get(i, j))
+			}
+		}
+	}
+}
+
+func TestElemDiv(t *testing.T) {
+	m1 := matrix.From2DSlice([][]float32{
+		{7, 8, 9},
+		{10, 11, 12},
+	})
+	m2 := matrix.From2DSlice([][]float32{
+		{1, 2, 3},
+		{4, 5, 6},
+	})
+	result := m1.ElemDiv(m2)
+	expected := matrix.From2DSlice([][]float32{
+		{7, 4, 3},
+		{2.5, 2.2, 2},
+	})
+
+	for i := range result.Rows() {
+		for j := range result.Cols() {
+			if result.Get(i, j) != expected.Get(i, j) {
+				t.Errorf("ElemDiv failed at (%d,%d): got %v, want %v", i, j, result.Get(i, j), expected.Get(i, j))
 			}
 		}
 	}

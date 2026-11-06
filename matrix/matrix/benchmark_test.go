@@ -38,3 +38,30 @@ func BenchmarkMatrixAdd(b *testing.B) {
 		runBenchmarks(b, tc.name, tc.fn)
 	}
 }
+
+func BenchmarkMatrixSub(b *testing.B) {
+	for _, tc := range []benchCase{
+		{"Regular", benchmarkMatrixSub},
+		{"SIMD", benchmarkMatrixSubSIMD},
+	} {
+		runBenchmarks(b, tc.name, tc.fn)
+	}
+}
+
+func BenchmarkMatrixElemMul(b *testing.B) {
+	for _, tc := range []benchCase{
+		{"Regular", benchmarkMatrixElemMul},
+		{"SIMD", benchmarkMatrixElemMulSIMD},
+	} {
+		runBenchmarks(b, tc.name, tc.fn)
+	}
+}
+
+func BenchmarkMatrixElemDiv(b *testing.B) {
+	for _, tc := range []benchCase{
+		{"Regular", benchmarkMatrixElemDiv},
+		{"SIMD", benchmarkMatrixElemDivSIMD},
+	} {
+		runBenchmarks(b, tc.name, tc.fn)
+	}
+}
