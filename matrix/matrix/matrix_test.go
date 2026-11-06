@@ -101,3 +101,30 @@ func TestElemDiv(t *testing.T) {
 		}
 	}
 }
+
+func TestTranspose(t *testing.T) {
+	input := matrix.From2DSlice([][]float32{
+		{1, 2, 3, 4, 5},
+		{6, 7, 8, 9, 10},
+		{11, 12, 13, 14, 15},
+	})
+	result := input.Transpose()
+	expected := [][]float32{
+		{1, 6, 11},
+		{2, 7, 12},
+		{3, 8, 13},
+		{4, 9, 14},
+		{5, 10, 15},
+	}
+
+	if result.Rows() != len(expected) || result.Cols() != len(expected[0]) {
+		t.Fatalf("Transpose dimensions = %dx%d, want %dx%d", result.Rows(), result.Cols(), len(expected), len(expected[0]))
+	}
+	for i, row := range expected {
+		for j, want := range row {
+			if got := result.Get(i, j); got != want {
+				t.Errorf("Transpose value at (%d,%d) = %v, want %v", i, j, got, want)
+			}
+		}
+	}
+}

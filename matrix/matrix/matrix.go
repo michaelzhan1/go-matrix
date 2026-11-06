@@ -65,6 +65,14 @@ func (m *Matrix) Values() [][]float32 {
 	return values
 }
 
+// Transpose transposes the matrix in place
+func (m *Matrix) Transpose() *Matrix {
+	// TODO: add some padding
+	res := NewMatrix(m.cols, m.rows)
+	transpose(m.values, res.values, m.rows, m.cols, 128, 8)
+	return res
+}
+
 // Add adds two matrices and returns a new matrix with the result
 func (m *Matrix) Add(other *Matrix) *Matrix {
 	if m.rows != other.rows || m.cols != other.cols {

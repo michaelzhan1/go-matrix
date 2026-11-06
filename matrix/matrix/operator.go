@@ -7,6 +7,22 @@ var width = simd.VectorBitSize() / 32
 // this file is needed because Go will not compile if SIMD is used in a struct.
 // these functions all take destination vectors to help with benchmarking.
 
+func transpose(mat, dest []float32, rows, cols, rowTile, colTile int) {
+	for i := 0; i < rows; i += rowTile {
+		iEnd := min(i+rowTile, rows)
+
+		for j := 0; j < cols; j += colTile {
+			jEnd := min(j+colTile, cols)
+
+			for k := i; k < iEnd; k++ {
+				for l := j; l < jEnd; l++ {
+					dest[l*rows+k] = mat[k*cols+l]
+				}
+			}
+		}
+	}
+}
+
 // add adds two matrices and stores the result in the destination matrix
 func add(mat, other, dest []float32) {
 	i := 0
