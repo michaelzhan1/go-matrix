@@ -13,3 +13,6 @@ test:
 
 benchmark:
 	$(GOFLAGS) $(GO) test ./matrix/... -bench='$(BENCH)' -benchmem
+
+vet:
+	$(GOFLAGS) $(GO) vet ./...

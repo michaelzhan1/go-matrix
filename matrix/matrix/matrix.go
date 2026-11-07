@@ -7,7 +7,7 @@ type Matrix struct {
 	values []float32
 	rows   int
 	cols   int
-	stride [2]int
+	stride int // account for padding
 }
 
 // NewMatrix returns an empty matrix with the given number of rows and columns
@@ -16,7 +16,23 @@ func NewMatrix(rows, cols int) *Matrix {
 		values: make([]float32, rows*cols),
 		rows:   rows,
 		cols:   cols,
-		stride: [2]int{cols, 1},
+		stride: cols,
+	}
+}
+
+// NewMatrixWithPadding returns an empty matrix with the given number of rows and columns and padding.
+func NewMatrixWithPadding(rows, cols int) *Matrix {
+	pad := 0
+	if cols%64 == 0 {
+		pad = 8
+	}
+
+	stride := cols + pad
+	return &Matrix{
+		values: make([]float32, rows*stride),
+		rows:   rows,
+		cols:   cols,
+		stride: stride,
 	}
 }
 
@@ -35,14 +51,28 @@ func From2DSlice(values [][]float32) *Matrix {
 	return m
 }
 
+func From2DSliceWithPadding(values [][]float32) *Matrix {
+	rows := len(values)
+	cols := len(values[0])
+
+	m := NewMatrixWithPadding(rows, cols)
+	for i, row := range values {
+		for j, val := range row {
+			m.Set(i, j, val)
+		}
+	}
+
+	return m
+}
+
 // Get returns the value at the specified row and column
 func (m *Matrix) Get(row, col int) float32 {
-	return m.values[row*m.stride[0]+col*m.stride[1]]
+	return m.values[row*m.stride+col]
 }
 
 // Set sets the value at the specified row and column
 func (m *Matrix) Set(row, col int, value float32) {
-	m.values[row*m.stride[0]+col*m.stride[1]] = value
+	m.values[row*m.stride+col] = value
 }
 
 // Rows returns the number of rows in the matrix
@@ -60,7 +90,7 @@ func (m *Matrix) Values() [][]float32 {
 	values := make([][]float32, m.rows)
 	for i := range m.rows {
 		values[i] = make([]float32, m.cols)
-		copy(values[i], m.values[i*m.stride[0]:(i+1)*m.stride[0]])
+		copy(values[i], m.values[i*m.stride:(i+1)*m.stride])
 	}
 	return values
 }
