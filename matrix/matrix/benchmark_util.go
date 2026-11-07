@@ -20,7 +20,7 @@ func benchmarkMatrixAddSIMD(b *testing.B, rows, cols int) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		add(m1.values, m2.values, res.values)
+		add(m1, m2, res)
 	}
 }
 
@@ -42,7 +42,7 @@ func benchmarkMatrixSubSIMD(b *testing.B, rows, cols int) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		sub(m1.values, m2.values, res.values)
+		sub(m1, m2, res)
 	}
 }
 
@@ -64,7 +64,7 @@ func benchmarkMatrixElemMulSIMD(b *testing.B, rows, cols int) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		elemMul(m1.values, m2.values, res.values)
+		elemMul(m1, m2, res)
 	}
 }
 
@@ -86,6 +86,6 @@ func benchmarkMatrixElemDivSIMD(b *testing.B, rows, cols int) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		elemDiv(m1.values, m2.values, res.values)
+		elemDiv(m1, m2, res)
 	}
 }

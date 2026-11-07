@@ -8,12 +8,24 @@ import (
 func benchmarkTranspose(b *testing.B, rowTile, colTile int) {
 	rows := 1024
 	cols := 1024
-	mat := make([]float32, rows*cols)
-	dest := make([]float32, rows*cols)
+	mat := NewRandomMatrix(rows, cols, -1.0, 1.0)
+	dest := NewRandomMatrix(cols, rows, -1.0, 1.0)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		transpose(mat, dest, rows, cols, rowTile, colTile)
+	}
+}
+
+func benchmarkTransposeWithPadding(b *testing.B, rowTile, colTile int) {
+	rows := 1024
+	cols := 1024
+	mat := NewRandomMatrixWithPadding(rows, cols, -1.0, 1.0)
+	dest := NewRandomMatrixWithPadding(cols, rows, -1.0, 1.0)
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		transposePadded(mat, dest, rows, cols, rowTile, colTile)
 	}
 }
 
@@ -22,6 +34,12 @@ func BenchmarkTranspose(b *testing.B) {
 	for _, tile := range tiles {
 		b.Run(fmt.Sprintf("tile-size-%dx%d", tile[0], tile[1]), func(b *testing.B) {
 			benchmarkTranspose(b, tile[0], tile[1])
+		})
+	}
+
+	for _, tile := range tiles {
+		b.Run(fmt.Sprintf("tile-size-%dx%d-with-padding", tile[0], tile[1]), func(b *testing.B) {
+			benchmarkTransposeWithPadding(b, tile[0], tile[1])
 		})
 	}
 }

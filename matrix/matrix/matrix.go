@@ -99,7 +99,7 @@ func (m *Matrix) Values() [][]float32 {
 func (m *Matrix) Transpose() *Matrix {
 	// TODO: add some padding
 	res := NewMatrix(m.cols, m.rows)
-	transpose(m.values, res.values, m.rows, m.cols, 128, 8)
+	transpose(m, res, m.rows, m.cols, 128, 8)
 	return res
 }
 
@@ -110,7 +110,7 @@ func (m *Matrix) Add(other *Matrix) *Matrix {
 	}
 
 	res := NewMatrix(m.rows, m.cols)
-	add(m.values, other.values, res.values)
+	add(m, other, res)
 	return res
 }
 
@@ -121,7 +121,7 @@ func (m *Matrix) Sub(other *Matrix) *Matrix {
 	}
 
 	res := NewMatrix(m.rows, m.cols)
-	sub(m.values, other.values, res.values)
+	sub(m, other, res)
 	return res
 }
 
@@ -132,7 +132,7 @@ func (m *Matrix) ElemMul(other *Matrix) *Matrix {
 	}
 
 	res := NewMatrix(m.rows, m.cols)
-	elemMul(m.values, other.values, res.values)
+	elemMul(m, other, res)
 	return res
 }
 
@@ -143,6 +143,6 @@ func (m *Matrix) ElemDiv(other *Matrix) *Matrix {
 	}
 
 	res := NewMatrix(m.rows, m.cols)
-	elemDiv(m.values, other.values, res.values)
+	elemDiv(m, other, res)
 	return res
 }
