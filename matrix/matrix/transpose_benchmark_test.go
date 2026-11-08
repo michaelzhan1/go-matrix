@@ -29,6 +29,15 @@ func benchmarkTransposeWithPadding(b *testing.B, rowTile, colTile int) {
 	}
 }
 
+func BenchmarkTransposeSquareTile(b *testing.B) {
+	size := []int{1, 2, 4, 8, 16, 32, 64, 128}
+	for _, s := range size {
+		b.Run(fmt.Sprintf("tile-size-%dx%d", s, s), func(b *testing.B) {
+			benchmarkTranspose(b, s, s)
+		})
+	}
+}
+
 func BenchmarkTranspose(b *testing.B) {
 	tiles := [][2]int{{1, 1}, {2, 2}, {4, 4}, {8, 8}, {16, 8}, {16, 16}, {32, 8}, {32, 32}, {64, 8}, {64, 64}, {128, 8}}
 	for _, tile := range tiles {
