@@ -95,11 +95,17 @@ func (m *Matrix) Values() [][]float32 {
 	return values
 }
 
-// Transpose transposes the matrix in place
-func (m *Matrix) Transpose() *Matrix {
-	// TODO: add some padding
+// TransposeTile transposes the matrix in place using tiling
+func (m *Matrix) TransposeTile() *Matrix {
 	res := NewMatrix(m.cols, m.rows)
-	transpose(m, res, m.rows, m.cols, 128, 8)
+	transposeTile(m, res, m.rows, m.cols, 128, 8)
+	return res
+}
+
+// Transpose transposes the matrix in place using recursive logic
+func (m *Matrix) TransposeRecursive() *Matrix {
+	res := NewMatrix(m.cols, m.rows)
+	transposeRecursive(m, res, m.rows, m.cols, 16, 16)
 	return res
 }
 

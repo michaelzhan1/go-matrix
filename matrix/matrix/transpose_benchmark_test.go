@@ -13,7 +13,7 @@ func benchmarkTransposeNoPadding(b *testing.B, rowTile, colTile int) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		transpose(mat, dest, rows, cols, rowTile, colTile)
+		transposeTile(mat, dest, rows, cols, rowTile, colTile)
 	}
 }
 
@@ -25,7 +25,7 @@ func benchmarkTranspose(b *testing.B, rowTile, colTile int) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		transpose(mat, dest, rows, cols, rowTile, colTile)
+		transposeTile(mat, dest, rows, cols, rowTile, colTile)
 	}
 }
 
@@ -48,7 +48,7 @@ func BenchmarkTransposeSquareTile(b *testing.B) {
 	})
 }
 
-func BenchmarkTranspose(b *testing.B) {
+func BenchmarkTransposeRectangleTile(b *testing.B) {
 	tiles := [][2]int{{16, 4}, {32, 4}, {64, 4}, {128, 4}, {16, 8}, {32, 8}, {64, 8}, {128, 8}}
 	b.Run("no-padding", func(b *testing.B) {
 		for _, tile := range tiles {

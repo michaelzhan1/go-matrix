@@ -6,6 +6,19 @@ import (
 	"github.com/michaelzhan1/go-matrix/matrix/matrix"
 )
 
+func checkValues(t *testing.T, mat, exp *matrix.Matrix) {
+	if mat.Rows() != exp.Rows() || mat.Cols() != exp.Cols() {
+		t.Fatalf("Matrix dimensions mismatch: got %dx%d, want %dx%d", mat.Rows(), mat.Cols(), exp.Rows(), exp.Cols())
+	}
+	for i := range mat.Rows() {
+		for j := range mat.Cols() {
+			if mat.Get(i, j) != exp.Get(i, j) {
+				t.Errorf("Matrix value mismatch at (%d,%d): got %v, want %v", i, j, mat.Get(i, j), exp.Get(i, j))
+			}
+		}
+	}
+}
+
 func TestAdd(t *testing.T) {
 	m1 := matrix.From2DSlice([][]float32{
 		{1, 2, 3},
@@ -21,13 +34,7 @@ func TestAdd(t *testing.T) {
 		{14, 16, 18},
 	})
 
-	for i := range result.Rows() {
-		for j := range result.Cols() {
-			if result.Get(i, j) != expected.Get(i, j) {
-				t.Errorf("Add failed at (%d,%d): got %v, want %v", i, j, result.Get(i, j), expected.Get(i, j))
-			}
-		}
-	}
+	checkValues(t, result, expected)
 }
 
 func TestSub(t *testing.T) {
@@ -45,13 +52,7 @@ func TestSub(t *testing.T) {
 		{6, 6, 6},
 	})
 
-	for i := range result.Rows() {
-		for j := range result.Cols() {
-			if result.Get(i, j) != expected.Get(i, j) {
-				t.Errorf("Sub failed at (%d,%d): got %v, want %v", i, j, result.Get(i, j), expected.Get(i, j))
-			}
-		}
-	}
+	checkValues(t, result, expected)
 }
 
 func TestElemMul(t *testing.T) {
@@ -69,13 +70,7 @@ func TestElemMul(t *testing.T) {
 		{40, 55, 72},
 	})
 
-	for i := range result.Rows() {
-		for j := range result.Cols() {
-			if result.Get(i, j) != expected.Get(i, j) {
-				t.Errorf("ElemMul failed at (%d,%d): got %v, want %v", i, j, result.Get(i, j), expected.Get(i, j))
-			}
-		}
-	}
+	checkValues(t, result, expected)
 }
 
 func TestElemDiv(t *testing.T) {
@@ -93,13 +88,7 @@ func TestElemDiv(t *testing.T) {
 		{2.5, 2.2, 2},
 	})
 
-	for i := range result.Rows() {
-		for j := range result.Cols() {
-			if result.Get(i, j) != expected.Get(i, j) {
-				t.Errorf("ElemDiv failed at (%d,%d): got %v, want %v", i, j, result.Get(i, j), expected.Get(i, j))
-			}
-		}
-	}
+	checkValues(t, result, expected)
 }
 
 func TestTranspose(t *testing.T) {
@@ -108,23 +97,26 @@ func TestTranspose(t *testing.T) {
 		{6, 7, 8, 9, 10},
 		{11, 12, 13, 14, 15},
 	})
-	result := input.Transpose()
-	expected := [][]float32{
+	expected := matrix.From2DSlice([][]float32{
 		{1, 6, 11},
 		{2, 7, 12},
 		{3, 8, 13},
 		{4, 9, 14},
 		{5, 10, 15},
+	})
+
+	funcs := []struct {
+		name string
+		fn   func() *matrix.Matrix
+	}{
+		{"tile", input.TransposeTile},
+		{"recursive", input.TransposeRecursive},
 	}
 
-	if result.Rows() != len(expected) || result.Cols() != len(expected[0]) {
-		t.Fatalf("Transpose dimensions = %dx%d, want %dx%d", result.Rows(), result.Cols(), len(expected), len(expected[0]))
-	}
-	for i, row := range expected {
-		for j, want := range row {
-			if got := result.Get(i, j); got != want {
-				t.Errorf("Transpose value at (%d,%d) = %v, want %v", i, j, got, want)
-			}
-		}
+	for _, f := range funcs {
+		t.Run(f.name, func(t *testing.T) {
+			result := f.fn()
+			checkValues(t, result, expected)
+		})
 	}
 }
