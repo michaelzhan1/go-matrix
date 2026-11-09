@@ -16,22 +16,6 @@ func transpose(mat, dest *Matrix, rows, cols, rowTile, colTile int) {
 
 			for k := i; k < iEnd; k++ {
 				for l := j; l < jEnd; l++ {
-					dest.values[l*rows+k] = mat.values[k*cols+l]
-				}
-			}
-		}
-	}
-}
-
-func transposePadded(mat, dest *Matrix, rows, cols, rowTile, colTile int) {
-	for i := 0; i < rows; i += rowTile {
-		iEnd := min(i+rowTile, rows)
-
-		for j := 0; j < cols; j += colTile {
-			jEnd := min(j+colTile, cols)
-
-			for k := i; k < iEnd; k++ {
-				for l := j; l < jEnd; l++ {
 					dest.values[l*dest.stride+k] = mat.values[k*mat.stride+l]
 				}
 			}
