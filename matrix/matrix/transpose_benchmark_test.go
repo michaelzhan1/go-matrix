@@ -49,7 +49,7 @@ func benchmarkTransposeSIMD(b *testing.B) {
 
 	b.ResetTimer()
 	for range b.N {
-		transposeSIMD(mat, dest, rows, cols)
+		transposeSIMD(mat, dest)
 	}
 }
 

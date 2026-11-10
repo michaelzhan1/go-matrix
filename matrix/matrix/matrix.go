@@ -112,7 +112,7 @@ func (m *Matrix) TransposeRecursive() *Matrix {
 // TransposeSIMD transposes the matrix in place using SIMD instructions
 func (m *Matrix) TransposeSIMD() *Matrix {
 	res := NewMatrix(m.cols, m.rows)
-	transposeSIMD(m, res, m.rows, m.cols)
+	transposeSIMD(m, res)
 	return res
 }
 

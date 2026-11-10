@@ -51,7 +51,7 @@ func transposeRecursive(mat, dest *Matrix, rows, cols, rowTile, colTile int) {
 }
 
 // transposeSIMD recursively loads tiles to transpose using SIMD instructions.
-func transposeSIMD(mat, dest *Matrix, rows, cols int) {
+func transposeSIMD(mat, dest *Matrix) {
 	var helper func(i, j, rowEnd, colEnd int)
 	helper = func(i, j, rowEnd, colEnd int) {
 		rowLen := rowEnd - i
@@ -237,4 +237,8 @@ func elemDiv(mat, other, dest *Matrix) {
 		v := v1.Div(v2)
 		v.StorePart(dest.values[i:])
 	}
+}
+
+func matMul(mat, other, dest *Matrix) {
+
 }

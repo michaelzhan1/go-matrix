@@ -9,7 +9,7 @@ func benchmarkMatrixAdd(b *testing.B, rows, cols int) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		naiveAdd(m1.values, m2.values, res.values)
+		naiveAdd(m1, m2, res)
 	}
 }
 
@@ -31,7 +31,7 @@ func benchmarkMatrixSub(b *testing.B, rows, cols int) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		naiveSub(m1.values, m2.values, res.values)
+		naiveSub(m1, m2, res)
 	}
 }
 
@@ -53,7 +53,7 @@ func benchmarkMatrixElemMul(b *testing.B, rows, cols int) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		naiveElemMul(m1.values, m2.values, res.values)
+		naiveElemMul(m1, m2, res)
 	}
 }
 
@@ -75,7 +75,7 @@ func benchmarkMatrixElemDiv(b *testing.B, rows, cols int) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		naiveElemDiv(m1.values, m2.values, res.values)
+		naiveElemDiv(m1, m2, res)
 	}
 }
 
