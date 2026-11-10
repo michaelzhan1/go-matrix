@@ -41,6 +41,18 @@ func benchmarkTransposeRecursive(b *testing.B, rowTile, colTile int) {
 	}
 }
 
+func benchmarkTransposeSIMD(b *testing.B) {
+	rows := 1024
+	cols := 1024
+	mat := NewRandomMatrixWithPadding(rows, cols, -1.0, 1.0)
+	dest := NewRandomMatrixWithPadding(cols, rows, -1.0, 1.0)
+
+	b.ResetTimer()
+	for range b.N {
+		transposeSIMD(mat, dest, rows, cols)
+	}
+}
+
 func BenchmarkTransposeSquareTile(b *testing.B) {
 	size := []int{1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024}
 	b.Run("no-padding", func(b *testing.B) {
@@ -95,5 +107,9 @@ func BenchmarkTransposeMethods(b *testing.B) {
 				benchmarkTransposeRecursive(b, tile[0], tile[1])
 			})
 		}
+	})
+
+	b.Run("transposeSIMD", func(b *testing.B) {
+		benchmarkTransposeSIMD(b)
 	})
 }

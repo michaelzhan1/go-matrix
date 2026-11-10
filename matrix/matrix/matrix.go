@@ -102,10 +102,17 @@ func (m *Matrix) TransposeTile() *Matrix {
 	return res
 }
 
-// Transpose transposes the matrix in place using recursive logic
+// TransposeRecursive transposes the matrix in place using recursive logic
 func (m *Matrix) TransposeRecursive() *Matrix {
 	res := NewMatrix(m.cols, m.rows)
 	transposeRecursive(m, res, m.rows, m.cols, 16, 16)
+	return res
+}
+
+// TransposeSIMD transposes the matrix in place using SIMD instructions
+func (m *Matrix) TransposeSIMD() *Matrix {
+	res := NewMatrix(m.cols, m.rows)
+	transposeSIMD(m, res, m.rows, m.cols)
 	return res
 }
 

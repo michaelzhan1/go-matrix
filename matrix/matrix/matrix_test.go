@@ -111,6 +111,7 @@ func TestTranspose(t *testing.T) {
 	}{
 		{"tile", input.TransposeTile},
 		{"recursive", input.TransposeRecursive},
+		{"simd", input.TransposeSIMD},
 	}
 
 	for _, f := range funcs {
