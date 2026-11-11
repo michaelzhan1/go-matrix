@@ -239,6 +239,28 @@ func elemDiv(mat, other, dest *Matrix) {
 	}
 }
 
+// matMul multiples two matrices by applying SIMD to basic IKJ
+// TODO: fix and see if we can somehow not pull v1 each time
 func matMul(mat, other, dest *Matrix) {
+	for i := range mat.rows {
+		for k := range mat.cols {
+			a := simd.BroadcastFloat32s(mat.values[i*mat.stride+k])
 
+			j := 0
+			for ; j+width <= other.cols; j += width {
+				v1 := simd.LoadFloat32s(dest.values[i*dest.stride+j : i*dest.stride+j+width])
+				v2 := simd.LoadFloat32s(other.values[k*other.stride+j : k*other.stride+j+width])
+				v := a.MulAdd(v2, v1)
+				v.Store(dest.values[i*dest.stride+j:])
+			}
+
+			if j < other.cols {
+				rem := other.cols - j
+				v1, _ := simd.LoadFloat32sPart(dest.values[i*dest.stride+j : i*dest.stride+j+rem])
+				v2, _ := simd.LoadFloat32sPart(other.values[k*other.stride+j : k*other.stride+j+rem])
+				v := a.MulAdd(v2, v1)
+				v.StorePart(dest.values[i*dest.stride+j : i*dest.stride+j+rem])
+			}
+		}
+	}
 }

@@ -19,6 +19,37 @@ func checkValues(t *testing.T, mat, exp *matrix.Matrix) {
 	}
 }
 
+func TestTranspose(t *testing.T) {
+	input := matrix.From2DSlice([][]float32{
+		{1, 2, 3, 4, 5},
+		{6, 7, 8, 9, 10},
+		{11, 12, 13, 14, 15},
+	})
+	expected := matrix.From2DSlice([][]float32{
+		{1, 6, 11},
+		{2, 7, 12},
+		{3, 8, 13},
+		{4, 9, 14},
+		{5, 10, 15},
+	})
+
+	funcs := []struct {
+		name string
+		fn   func() *matrix.Matrix
+	}{
+		{"tile", input.TransposeTile},
+		{"recursive", input.TransposeRecursive},
+		{"simd", input.TransposeSIMD},
+	}
+
+	for _, f := range funcs {
+		t.Run(f.name, func(t *testing.T) {
+			result := f.fn()
+			checkValues(t, result, expected)
+		})
+	}
+}
+
 func TestAdd(t *testing.T) {
 	m1 := matrix.From2DSlice([][]float32{
 		{1, 2, 3},
@@ -91,33 +122,23 @@ func TestElemDiv(t *testing.T) {
 	checkValues(t, result, expected)
 }
 
-func TestTranspose(t *testing.T) {
-	input := matrix.From2DSlice([][]float32{
-		{1, 2, 3, 4, 5},
-		{6, 7, 8, 9, 10},
-		{11, 12, 13, 14, 15},
+func TestMatMul(t *testing.T) {
+	m1 := matrix.From2DSlice([][]float32{
+		{1, 2, 3},
+		{4, 5, 6},
+		{7, 8, 9},
 	})
+	m2 := matrix.From2DSlice([][]float32{
+		{1, 2, 3},
+		{4, 5, 6},
+		{7, 8, 9},
+	})
+	result := m1.MatMul(m2)
 	expected := matrix.From2DSlice([][]float32{
-		{1, 6, 11},
-		{2, 7, 12},
-		{3, 8, 13},
-		{4, 9, 14},
-		{5, 10, 15},
+		{30, 36, 42},
+		{66, 81, 96},
+		{102, 126, 150},
 	})
 
-	funcs := []struct {
-		name string
-		fn   func() *matrix.Matrix
-	}{
-		{"tile", input.TransposeTile},
-		{"recursive", input.TransposeRecursive},
-		{"simd", input.TransposeSIMD},
-	}
-
-	for _, f := range funcs {
-		t.Run(f.name, func(t *testing.T) {
-			result := f.fn()
-			checkValues(t, result, expected)
-		})
-	}
+	checkValues(t, result, expected)
 }

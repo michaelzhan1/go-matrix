@@ -159,3 +159,13 @@ func (m *Matrix) ElemDiv(other *Matrix) *Matrix {
 	elemDiv(m, other, res)
 	return res
 }
+
+func (m *Matrix) MatMul(other *Matrix) *Matrix {
+	if m.cols != other.rows {
+		panic(fmt.Sprintf("matrix dimensions do not match for multiplication:  %dx%d vs %dx%d", m.rows, m.cols, other.rows, other.cols))
+	}
+
+	res := NewMatrix(m.rows, other.cols)
+	matMul(m, other, res)
+	return res
+}
