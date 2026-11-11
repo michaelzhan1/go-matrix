@@ -239,9 +239,8 @@ func elemDiv(mat, other, dest *Matrix) {
 	}
 }
 
-// matMul multiples two matrices by applying SIMD to basic IKJ
-// TODO: fix and see if we can somehow not pull v1 each time
-func matMul(mat, other, dest *Matrix) {
+// matMulIKJ multiples two matrices by applying SIMD to basic IKJ
+func matMulIKJ(mat, other, dest *Matrix) {
 	for i := range mat.rows {
 		for k := range mat.cols {
 			a := simd.BroadcastFloat32s(mat.values[i*mat.stride+k])
@@ -260,6 +259,30 @@ func matMul(mat, other, dest *Matrix) {
 				v2, _ := simd.LoadFloat32sPart(other.values[k*other.stride+j : k*other.stride+j+rem])
 				v := a.MulAdd(v2, v1)
 				v.StorePart(dest.values[i*dest.stride+j : i*dest.stride+j+rem])
+			}
+		}
+	}
+}
+
+func matMulIJK(mat, other, dest *Matrix) {
+	for i := range mat.rows {
+		for j := 0; j < other.cols; j += width {
+			acc := simd.BroadcastFloat32s(0)
+
+			if j+width < other.cols {
+				for k := range mat.cols {
+					a := simd.BroadcastFloat32s(mat.values[i*mat.stride+k])
+					b := simd.LoadFloat32s(other.values[k*other.stride+j:])
+					acc = a.MulAdd(b, acc)
+				}
+				acc.Store(dest.values[i*dest.stride+j:])
+			} else {
+				for k := range mat.cols {
+					a := simd.BroadcastFloat32s(mat.values[i*mat.stride+k])
+					b, _ := simd.LoadFloat32sPart(other.values[k*other.stride+j : k*other.stride+other.cols])
+					acc = a.MulAdd(b, acc)
+				}
+				acc.StorePart(dest.values[i*dest.stride+j : i*dest.stride+dest.cols])
 			}
 		}
 	}

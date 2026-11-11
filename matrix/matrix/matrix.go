@@ -160,12 +160,22 @@ func (m *Matrix) ElemDiv(other *Matrix) *Matrix {
 	return res
 }
 
-func (m *Matrix) MatMul(other *Matrix) *Matrix {
+func (m *Matrix) MatMulIKJ(other *Matrix) *Matrix {
 	if m.cols != other.rows {
 		panic(fmt.Sprintf("matrix dimensions do not match for multiplication:  %dx%d vs %dx%d", m.rows, m.cols, other.rows, other.cols))
 	}
 
 	res := NewMatrix(m.rows, other.cols)
-	matMul(m, other, res)
+	matMulIKJ(m, other, res)
+	return res
+}
+
+func (m *Matrix) MatMulIJK(other *Matrix) *Matrix {
+	if m.cols != other.rows {
+		panic(fmt.Sprintf("matrix dimensions do not match for multiplication:  %dx%d vs %dx%d", m.rows, m.cols, other.rows, other.cols))
+	}
+
+	res := NewMatrix(m.rows, other.cols)
+	matMulIJK(m, other, res)
 	return res
 }

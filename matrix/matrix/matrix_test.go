@@ -133,12 +133,24 @@ func TestMatMul(t *testing.T) {
 		{4, 5, 6},
 		{7, 8, 9},
 	})
-	result := m1.MatMul(m2)
 	expected := matrix.From2DSlice([][]float32{
 		{30, 36, 42},
 		{66, 81, 96},
 		{102, 126, 150},
 	})
 
-	checkValues(t, result, expected)
+	funcs := []struct {
+		name string
+		fn   func(*matrix.Matrix) *matrix.Matrix
+	}{
+		{"ikj", m1.MatMulIKJ},
+		{"ijk", m1.MatMulIJK},
+	}
+
+	for _, f := range funcs {
+		t.Run(f.name, func(t *testing.T) {
+			result := f.fn(m2)
+			checkValues(t, result, expected)
+		})
+	}
 }
