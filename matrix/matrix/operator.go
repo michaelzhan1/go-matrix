@@ -267,22 +267,25 @@ func matMulIKJ(mat, other, dest *Matrix) {
 func matMulIJK(mat, other, dest *Matrix) {
 	for i := range mat.rows {
 		for j := 0; j < other.cols; j += width {
+			end := min(j+width, other.cols)
 			acc := simd.BroadcastFloat32s(0)
 
-			if j+width <= other.cols {
-				for k := range mat.cols {
-					a := simd.BroadcastFloat32s(mat.values[i*mat.stride+k])
-					b := simd.LoadFloat32s(other.values[k*other.stride+j : k*other.stride+j+width])
+			for k := range mat.cols {
+				a := simd.BroadcastFloat32s(mat.values[i*mat.stride+k])
+				start := k*other.stride + j
+				if end-j == width {
+					acc = a.MulAdd(simd.LoadFloat32s(other.values[start:start+width]), acc)
+				} else {
+					b, _ := simd.LoadFloat32sPart(other.values[start : start+end-j])
 					acc = a.MulAdd(b, acc)
 				}
-				acc.Store(dest.values[i*dest.stride+j : i*dest.stride+j+width])
+			}
+
+			base := i*dest.stride + j
+			if j+width == end {
+				acc.Store(dest.values[base : base+width])
 			} else {
-				for k := range mat.cols {
-					a := simd.BroadcastFloat32s(mat.values[i*mat.stride+k])
-					b, _ := simd.LoadFloat32sPart(other.values[k*other.stride+j : k*other.stride+other.cols])
-					acc = a.MulAdd(b, acc)
-				}
-				acc.StorePart(dest.values[i*dest.stride+j : i*dest.stride+dest.cols])
+				acc.StorePart(dest.values[base : base+end-j])
 			}
 		}
 	}
@@ -380,7 +383,7 @@ func matMulIJKRows4(mat, other, dest *Matrix) {
 				}
 			}
 
-			for row := 0; row < rowCount; row++ {
+			for row := range rowCount {
 				base := (i+row)*dest.stride + j
 				var acc simd.Float32s
 				switch row {
