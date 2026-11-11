@@ -269,13 +269,13 @@ func matMulIJK(mat, other, dest *Matrix) {
 		for j := 0; j < other.cols; j += width {
 			acc := simd.BroadcastFloat32s(0)
 
-			if j+width < other.cols {
+			if j+width <= other.cols {
 				for k := range mat.cols {
 					a := simd.BroadcastFloat32s(mat.values[i*mat.stride+k])
-					b := simd.LoadFloat32s(other.values[k*other.stride+j:])
+					b := simd.LoadFloat32s(other.values[k*other.stride+j : k*other.stride+j+width])
 					acc = a.MulAdd(b, acc)
 				}
-				acc.Store(dest.values[i*dest.stride+j:])
+				acc.Store(dest.values[i*dest.stride+j : i*dest.stride+j+width])
 			} else {
 				for k := range mat.cols {
 					a := simd.BroadcastFloat32s(mat.values[i*mat.stride+k])
@@ -283,6 +283,121 @@ func matMulIJK(mat, other, dest *Matrix) {
 					acc = a.MulAdd(b, acc)
 				}
 				acc.StorePart(dest.values[i*dest.stride+j : i*dest.stride+dest.cols])
+			}
+		}
+	}
+}
+
+// matMulIJKUnrolled4 uses four independent SIMD accumulators per output row.
+func matMulIJKUnrolled4(mat, other, dest *Matrix) {
+	const vectorsPerBlock = 4
+	blockWidth := vectorsPerBlock * width
+
+	for i := range mat.rows {
+		j := 0
+		for ; j+blockWidth <= other.cols; j += blockWidth {
+			acc0 := simd.BroadcastFloat32s(0)
+			acc1 := simd.BroadcastFloat32s(0)
+			acc2 := simd.BroadcastFloat32s(0)
+			acc3 := simd.BroadcastFloat32s(0)
+
+			for k := range mat.cols {
+				a := simd.BroadcastFloat32s(mat.values[i*mat.stride+k])
+				base := k*other.stride + j
+				acc0 = a.MulAdd(simd.LoadFloat32s(other.values[base:base+width]), acc0)
+				acc1 = a.MulAdd(simd.LoadFloat32s(other.values[base+width:base+2*width]), acc1)
+				acc2 = a.MulAdd(simd.LoadFloat32s(other.values[base+2*width:base+3*width]), acc2)
+				acc3 = a.MulAdd(simd.LoadFloat32s(other.values[base+3*width:base+4*width]), acc3)
+			}
+
+			base := i*dest.stride + j
+			acc0.Store(dest.values[base : base+width])
+			acc1.Store(dest.values[base+width : base+2*width])
+			acc2.Store(dest.values[base+2*width : base+3*width])
+			acc3.Store(dest.values[base+3*width : base+4*width])
+		}
+
+		for ; j < other.cols; j += width {
+			end := min(j+width, other.cols)
+			acc := simd.BroadcastFloat32s(0)
+
+			for k := range mat.cols {
+				a := simd.BroadcastFloat32s(mat.values[i*mat.stride+k])
+				start := k*other.stride + j
+				if end-j == width {
+					acc = a.MulAdd(simd.LoadFloat32s(other.values[start:start+width]), acc)
+				} else {
+					b, _ := simd.LoadFloat32sPart(other.values[start : start+end-j])
+					acc = a.MulAdd(b, acc)
+				}
+			}
+
+			base := i*dest.stride + j
+			if end-j == width {
+				acc.Store(dest.values[base : base+width])
+			} else {
+				acc.StorePart(dest.values[base : base+end-j])
+			}
+		}
+	}
+}
+
+// matMulIJKRows4 reuses each SIMD load from other across four output rows.
+func matMulIJKRows4(mat, other, dest *Matrix) {
+	const rowsPerBlock = 4
+
+	for i := 0; i < mat.rows; i += rowsPerBlock {
+		rowCount := min(rowsPerBlock, mat.rows-i)
+		for j := 0; j < other.cols; j += width {
+			end := min(j+width, other.cols)
+			acc0 := simd.BroadcastFloat32s(0)
+			acc1 := simd.BroadcastFloat32s(0)
+			acc2 := simd.BroadcastFloat32s(0)
+			acc3 := simd.BroadcastFloat32s(0)
+
+			for k := range mat.cols {
+				base := k*other.stride + j
+				var b simd.Float32s
+				if end-j == width {
+					b = simd.LoadFloat32s(other.values[base : base+width])
+				} else {
+					b, _ = simd.LoadFloat32sPart(other.values[base : base+end-j])
+				}
+
+				a0 := simd.BroadcastFloat32s(mat.values[i*mat.stride+k])
+				acc0 = a0.MulAdd(b, acc0)
+				if rowCount > 1 {
+					a1 := simd.BroadcastFloat32s(mat.values[(i+1)*mat.stride+k])
+					acc1 = a1.MulAdd(b, acc1)
+				}
+				if rowCount > 2 {
+					a2 := simd.BroadcastFloat32s(mat.values[(i+2)*mat.stride+k])
+					acc2 = a2.MulAdd(b, acc2)
+				}
+				if rowCount > 3 {
+					a3 := simd.BroadcastFloat32s(mat.values[(i+3)*mat.stride+k])
+					acc3 = a3.MulAdd(b, acc3)
+				}
+			}
+
+			for row := 0; row < rowCount; row++ {
+				base := (i+row)*dest.stride + j
+				var acc simd.Float32s
+				switch row {
+				case 0:
+					acc = acc0
+				case 1:
+					acc = acc1
+				case 2:
+					acc = acc2
+				case 3:
+					acc = acc3
+				}
+				if end-j == width {
+					acc.Store(dest.values[base : base+width])
+				} else {
+					acc.StorePart(dest.values[base : base+end-j])
+				}
 			}
 		}
 	}
