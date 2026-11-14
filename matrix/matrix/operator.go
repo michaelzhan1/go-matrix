@@ -405,3 +405,15 @@ func matMulIJKRows4(mat, other, dest *Matrix) {
 		}
 	}
 }
+
+func matMulTranspose(mat, other, dest *Matrix) {
+	otherT := other.TransposeSIMD() // j x k
+
+	for i := range mat.rows {
+		for j := range otherT.rows {
+			for k := range mat.cols {
+				dest.values[i*dest.stride+j] += mat.values[i*mat.stride+k] * otherT.values[j*otherT.stride+k]
+			}
+		}
+	}
+}

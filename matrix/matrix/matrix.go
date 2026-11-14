@@ -179,3 +179,33 @@ func (m *Matrix) MatMulIJK(other *Matrix) *Matrix {
 	matMulIJK(m, other, res)
 	return res
 }
+
+func (m *Matrix) MatMulIJKUnrolled(other *Matrix) *Matrix {
+	if m.cols != other.rows {
+		panic(fmt.Sprintf("matrix dimensions do not match for multiplication:  %dx%d vs %dx%d", m.rows, m.cols, other.rows, other.cols))
+	}
+
+	res := NewMatrix(m.rows, other.cols)
+	matMulIJKUnrolled4(m, other, res)
+	return res
+}
+
+func (m *Matrix) MatMulIJKRows(other *Matrix) *Matrix {
+	if m.cols != other.rows {
+		panic(fmt.Sprintf("matrix dimensions do not match for multiplication:  %dx%d vs %dx%d", m.rows, m.cols, other.rows, other.cols))
+	}
+
+	res := NewMatrix(m.rows, other.cols)
+	matMulIJKRows4(m, other, res)
+	return res
+}
+
+func (m *Matrix) MatMulTranspose(other *Matrix) *Matrix {
+	if m.cols != other.rows {
+		panic(fmt.Sprintf("matrix dimensions do not match for multiplication:  %dx%d vs %dx%d", m.rows, m.cols, other.rows, other.cols))
+	}
+
+	res := NewMatrix(m.rows, other.cols)
+	matMulTranspose(m, other, res)
+	return res
+}

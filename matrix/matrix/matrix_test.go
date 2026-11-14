@@ -145,6 +145,9 @@ func TestMatMul(t *testing.T) {
 	}{
 		{"ikj", m1.MatMulIKJ},
 		{"ijk", m1.MatMulIJK},
+		{"ijk-unrolled", m1.MatMulIJKUnrolled},
+		{"ijk-rows", m1.MatMulIJKRows},
+		{"transpose", m1.MatMulTranspose},
 	}
 
 	for _, f := range funcs {
