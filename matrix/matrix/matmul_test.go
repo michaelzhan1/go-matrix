@@ -20,6 +20,7 @@ func TestMatMulKernels(t *testing.T) {
 		{name: "ijk-unrolled4", fn: matMulIJKUnrolled4},
 		{name: "ijk-rows4", fn: matMulIJKRows4},
 		{name: "transpose", fn: matMulTranspose},
+		{name: "transpose-rows4", fn: matMulTransposeRows4},
 	}
 
 	for _, cols := range columnCounts {

@@ -407,34 +407,96 @@ func matMulIJKRows4(mat, other, dest *Matrix) {
 }
 
 func matMulTranspose(mat, other, dest *Matrix) {
-	otherT := other.TransposeSIMD() // j x k
+	otherT := other.TransposeSIMD()
 	tmp := make([]float32, width)
 
+	n := mat.cols
+	full := n - n%width
+
 	for i := range mat.rows {
+		a := mat.values[i*mat.stride:]
+
 		for j := range otherT.rows {
+			b := otherT.values[j*otherT.stride:]
+
 			acc := simd.BroadcastFloat32s(0)
 
-			k := 0
-			for ; k < mat.cols; k += width {
-				ii := i*mat.stride + k
-				jj := j*otherT.stride + k
-				end := min(k+width, mat.cols)
+			for k := 0; k < full; k += width {
+				av := simd.LoadFloat32s(a[k : k+width])
+				bv := simd.LoadFloat32s(b[k : k+width])
+				acc = av.MulAdd(bv, acc)
+			}
 
-				if end-k == width {
-					acc = simd.LoadFloat32s(mat.values[ii:ii+width]).MulAdd(simd.LoadFloat32s(otherT.values[jj:jj+width]), acc)
-				} else {
-					a, _ := simd.LoadFloat32sPart(mat.values[ii : ii+end-k])
-					b, _ := simd.LoadFloat32sPart(otherT.values[jj : jj+end-k])
-					acc = a.MulAdd(b, acc)
-				}
+			if full < n {
+				av, _ := simd.LoadFloat32sPart(a[full:n])
+				bv, _ := simd.LoadFloat32sPart(b[full:n])
+				acc = av.MulAdd(bv, acc)
 			}
 
 			acc.Store(tmp)
-			sum := float32(0)
-			for _, val := range tmp {
-				sum += val
+
+			var sum float32
+			for _, v := range tmp {
+				sum += v
 			}
+
 			dest.values[i*dest.stride+j] = sum
+		}
+	}
+}
+
+func matMulTransposeRows4(mat, other, dest *Matrix) {
+	otherT := other.TransposeSIMD()
+	tmp := make([]float32, width)
+
+	n := mat.cols
+	full := n - n%width
+
+	for i := range mat.rows {
+		a := mat.values[i*mat.stride:]
+
+		for j := 0; j < otherT.rows; j += 4 {
+			count := min(4, otherT.rows-j)
+
+			var acc [4]simd.Float32s
+			for x := 0; x < count; x++ {
+				acc[x] = simd.BroadcastFloat32s(0)
+			}
+
+			for k := 0; k < full; k += width {
+				av := simd.LoadFloat32s(a[k : k+width])
+
+				for x := 0; x < count; x++ {
+					off := (j+x)*otherT.stride + k
+					bv := simd.LoadFloat32s(
+						otherT.values[off : off+width],
+					)
+					acc[x] = av.MulAdd(bv, acc[x])
+				}
+			}
+
+			if full < n {
+				av, _ := simd.LoadFloat32sPart(a[full:n])
+
+				for x := 0; x < count; x++ {
+					off := (j+x)*otherT.stride + full
+					bv, _ := simd.LoadFloat32sPart(
+						otherT.values[off : off+n-full],
+					)
+					acc[x] = av.MulAdd(bv, acc[x])
+				}
+			}
+
+			for x := 0; x < count; x++ {
+				acc[x].Store(tmp)
+
+				var sum float32
+				for _, v := range tmp {
+					sum += v
+				}
+
+				dest.values[i*dest.stride+j+x] = sum
+			}
 		}
 	}
 }
