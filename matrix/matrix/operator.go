@@ -408,12 +408,33 @@ func matMulIJKRows4(mat, other, dest *Matrix) {
 
 func matMulTranspose(mat, other, dest *Matrix) {
 	otherT := other.TransposeSIMD() // j x k
+	tmp := make([]float32, width)
 
 	for i := range mat.rows {
 		for j := range otherT.rows {
-			for k := range mat.cols {
-				dest.values[i*dest.stride+j] += mat.values[i*mat.stride+k] * otherT.values[j*otherT.stride+k]
+			acc := simd.BroadcastFloat32s(0)
+
+			k := 0
+			for ; k < mat.cols; k += width {
+				ii := i*mat.stride + k
+				jj := j*otherT.stride + k
+				end := min(k+width, mat.cols)
+
+				if end-k == width {
+					acc = simd.LoadFloat32s(mat.values[ii:ii+width]).MulAdd(simd.LoadFloat32s(otherT.values[jj:jj+width]), acc)
+				} else {
+					a, _ := simd.LoadFloat32sPart(mat.values[ii : ii+end-k])
+					b, _ := simd.LoadFloat32sPart(otherT.values[jj : jj+end-k])
+					acc = a.MulAdd(b, acc)
+				}
 			}
+
+			acc.Store(tmp)
+			sum := float32(0)
+			for _, val := range tmp {
+				sum += val
+			}
+			dest.values[i*dest.stride+j] = sum
 		}
 	}
 }

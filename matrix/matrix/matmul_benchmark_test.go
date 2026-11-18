@@ -11,6 +11,7 @@ func BenchmarkMatMul(b *testing.B) {
 		{name: "ijk", fn: matMulIJK},
 		{name: "ijk-unrolled4", fn: matMulIJKUnrolled4},
 		{name: "ijk-rows4", fn: matMulIJKRows4},
+		{name: "transpose", fn: matMulTranspose},
 	}
 
 	shapes := []struct {
